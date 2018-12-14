@@ -68,6 +68,7 @@ Local<String> convertAmount(uint64_t amount) {
 }
 
 Local<Object> makeTransactionInfoObject(const SafexNativeTransactionInfo* transaction) {
+    ENTER_FUNC();
     auto transfersNative = transaction->transfers();
     auto transfers = Nan::New<Array>(transfersNative.size());
 
@@ -156,6 +157,7 @@ Local<Object> makeTransactionInfoObject(const SafexNativeTransactionInfo* transa
     result->Set(Nan::GetCurrentContext(),
                 Nan::New("paymentId").ToLocalChecked(),
                 Nan::New(transaction->paymentId().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 
     return result;
 }
@@ -165,13 +167,15 @@ Local<Object> makeTransactionInfoObject(const SafexNativeTransactionInfo* transa
 Nan::Persistent<v8::Function> Wallet::constructor;
 
 Wallet::~Wallet() {
+    ENTER_FUNC();
     if (wallet_) {
         delete wallet_;
     }
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::WalletExists) {
-
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsString()) {
         Nan::ThrowTypeError("Function accepts path to wallet");
         return;
@@ -185,9 +189,11 @@ NAN_METHOD(Wallet::WalletExists) {
     }
     bool exists = manager->walletExists(path);
     info.GetReturnValue().Set(Nan::New(exists));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::CreateWallet) {
+    ENTER_FUNC();
     CreateWalletArgs walletArgs;
     std::string error = walletArgs.Init(info);
     if (!error.empty()) {
@@ -198,9 +204,11 @@ NAN_METHOD(Wallet::CreateWallet) {
     CreateWalletTask* task = new CreateWalletTask(walletArgs);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::CreateWalletFromKeys) {
+        ENTER_FUNC();
         CreateWalletFromKeysArgs walletArgs;
         std::string error = walletArgs.Init(info);
         if (!error.empty()) {
@@ -211,6 +219,7 @@ NAN_METHOD(Wallet::CreateWalletFromKeys) {
         CreateWalletFromKeysTask* task = new CreateWalletFromKeysTask(walletArgs);
         auto promise = task->Enqueue();
         info.GetReturnValue().Set(promise);
+        EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::OpenWallet) {

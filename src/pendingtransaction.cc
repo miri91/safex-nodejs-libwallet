@@ -4,6 +4,7 @@
 
 #include <wallet_api.h>
 #include "wallettasks.h"
+#include "walletlog.h"
 
 using namespace v8;
 
@@ -12,12 +13,15 @@ namespace exawallet {
 Nan::Persistent<Function> PendingTransaction::constructor;
 
 PendingTransaction::~PendingTransaction() {
+    ENTER_FUNC();
     if (transaction) {
         delete transaction;
     }
+    EXIT_FUNC();
 }
 
 NAN_MODULE_INIT(PendingTransaction::Init) {
+    ENTER_FUNC();
     struct FunctionRegisterInfo {
         const char* name;
         Nan::FunctionCallback func;
@@ -41,10 +45,12 @@ NAN_MODULE_INIT(PendingTransaction::Init) {
     }
 
     constructor.Reset(tpl->GetFunction());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::New) {
 
+    ENTER_FUNC();
   if (info.IsConstructCall()) {
     PendingTransaction* obj = new PendingTransaction(nullptr);
     obj->Wrap(info.This());
@@ -56,10 +62,12 @@ NAN_METHOD(PendingTransaction::New) {
     Local<Context> context = Nan::GetCurrentContext();
     Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
     info.GetReturnValue().Set(instance);
+    EXIT_FUNC();
   }
 }
 
 Local<Object> PendingTransaction::NewInstance(SafexNativePendingTransaction* tx) {
+    ENTER_FUNC();
     const unsigned argc = 0;
     Local<Value> argv[1] = { Nan::Null() };
     Local<Function> cons = Nan::New(constructor);
@@ -68,22 +76,27 @@ Local<Object> PendingTransaction::NewInstance(SafexNativePendingTransaction* tx)
 
     PendingTransaction* t = new PendingTransaction(tx);
     t->Wrap(instance);
+    EXIT_FUNC();
     return instance;
 }
 
 NAN_METHOD(PendingTransaction::Commit) {
+    ENTER_FUNC();
     PendingTransaction* obj = ObjectWrap::Unwrap<PendingTransaction>(info.Holder());
 
     CommitTransactionTask* task = new CommitTransactionTask(obj->transaction);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::Amount) {
+    ENTER_FUNC();
     PendingTransaction* obj = ObjectWrap::Unwrap<PendingTransaction>(info.Holder());
     auto amount = std::to_string(obj->transaction->amount());
 
     info.GetReturnValue().Set(Nan::New(amount.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::Dust) {
@@ -91,16 +104,20 @@ NAN_METHOD(PendingTransaction::Dust) {
     auto dust = std::to_string(obj->transaction->dust());
 
     info.GetReturnValue().Set(Nan::New(dust.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::Fee) {
+    ENTER_FUNC();
     PendingTransaction* obj = ObjectWrap::Unwrap<PendingTransaction>(info.Holder());
     auto fee = std::to_string(obj->transaction->fee());
 
     info.GetReturnValue().Set(Nan::New(fee.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::TransactionsIds) {
+    ENTER_FUNC();
     PendingTransaction* obj = ObjectWrap::Unwrap<PendingTransaction>(info.Holder());
 
     auto transactions = obj->transaction->txid();
@@ -115,11 +132,14 @@ NAN_METHOD(PendingTransaction::TransactionsIds) {
     }
 
     info.GetReturnValue().Set(result);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(PendingTransaction::TransactionsCount) {
+    ENTER_FUNC();
     PendingTransaction* obj = ObjectWrap::Unwrap<PendingTransaction>(info.Holder());
     info.GetReturnValue().Set(Nan::New((uint32_t)obj->transaction->txCount()));
+    EXIT_FUNC();
 }
 
 

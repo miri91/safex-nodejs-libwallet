@@ -5,6 +5,8 @@
 #include <nan.h>
 #include <string>
 
+#include "walletlog.h"
+
 using namespace v8;
 
 namespace exawallet {
@@ -72,6 +74,7 @@ uint64_t convertValue<uint64_t>(Local<Value> value) {
 }
 
 std::string CreateWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
+    ENTER_FUNC();
     if (args.Length() != 1 || !args[0]->IsObject()) {
         return "Argument must be an object";
     }
@@ -99,11 +102,13 @@ std::string CreateWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args)
     } else {
         return "Invalid value for network: " + net;
     }
+    EXIT_FUNC();
 
     return {};
 }
 
   std::string CreateWalletFromKeysArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
+    ENTER_FUNC();
       if (args.Length() != 1 || !args[0]->IsObject()) {
           return "Argument must be an object";
       }
@@ -145,11 +150,13 @@ std::string CreateWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args)
       if (!getRequiredProperty<std::string>(obj, "spendKeyString", spendKeyString)) {
           return std::string("Required property not found: spendKeyString");
       }
+      EXIT_FUNC();
 
       return {};
   }
 
 std::string OpenWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
+    ENTER_FUNC();
     if (args.Length() != 1 || !args[0]->IsObject()) {
         return "Argument must be an object";
     }
@@ -175,12 +182,14 @@ std::string OpenWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
     } else {
         return "Invalid value for network: " + net;
     }
+    EXIT_FUNC();
 
     return {};
 }
 
 
 std::string RecoveryWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
+    ENTER_FUNC();
     if (args.Length() != 1 || !args[0]->IsObject()) {
         return "Argument must be an object";
     }
@@ -212,12 +221,14 @@ std::string RecoveryWalletArgs::Init(const Nan::FunctionCallbackInfo<Value>& arg
     if(!getRequiredProperty<std::string>(obj, "mnemonic", mnemonic)) {
         return std::string("Required property not found: mnemonic");
     }
+    EXIT_FUNC();
 
     return {};
 }
 
 
 std::string CreateTransactionArgs::Init(const Nan::FunctionCallbackInfo<Value>& args) {
+    ENTER_FUNC();
     if (args.Length() != 1 || !args[0]->IsObject()) {
         return "Argument must be an object";
     }
@@ -243,6 +254,7 @@ std::string CreateTransactionArgs::Init(const Nan::FunctionCallbackInfo<Value>& 
     if (mixin < MINIMAL_MIXIN) {
         return "Minimal mixin: " + std::to_string(MINIMAL_MIXIN);
     }
+    EXIT_FUNC();
 
     return {};
 }

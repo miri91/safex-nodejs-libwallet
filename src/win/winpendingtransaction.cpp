@@ -7,64 +7,92 @@
 #include <cstring>
 
 #include "winpendingtransaction.h"
+#include "walletlog.h"
 
 namespace Safex
 {
 
-    WinPendingTransaction::WinPendingTransaction(void* ptr) : m_innerPtr(ptr) {
-
+  WinPendingTransaction::WinPendingTransaction(void *ptr) : m_innerPtr(ptr)
+  {
+    ENTER_FUNC();
+    EXIT_FUNC();
   }
 
   WinPendingTransaction::~WinPendingTransaction()
   {
+    ENTER_FUNC();
     ::win_pt_delete(m_innerPtr);
+    EXIT_FUNC();
   }
 
   int WinPendingTransaction::status() const
   {
-    return ::win_pt_status(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_status(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   std::string WinPendingTransaction::errorString() const
   {
-    return std::string(win_pt_errorString(m_innerPtr));
+    ENTER_FUNC();
+    auto result = std::string(win_pt_errorString(m_innerPtr));
+    EXIT_FUNC();
+    return result;
   }
 
   bool WinPendingTransaction::commit(const std::string &filename, bool overwrite)
   {
-    return static_cast<bool>(::win_pt_commit(m_innerPtr));
+    ENTER_FUNC();
+    auto result = static_cast<bool>(::win_pt_commit(m_innerPtr));
+    EXIT_FUNC();
+    return result;
   }
 
   uint64_t WinPendingTransaction::amount() const
   {
-    return ::win_pt_amount(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_amount(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   uint64_t WinPendingTransaction::tokenAmount() const
   {
-    return ::win_pt_tokenAmount(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_tokenAmount(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   uint64_t WinPendingTransaction::dust() const
   {
-    return ::win_pt_dust(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_dust(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   uint64_t WinPendingTransaction::fee() const
   {
-    return ::win_pt_fee(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_fee(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   std::vector<std::string> WinPendingTransaction::txid() const
   {
-    char* results = ::win_pt_txid(m_innerPtr);
-    char* temp = results;
+    ENTER_FUNC();
+    char *results = ::win_pt_txid(m_innerPtr);
+    char *temp = results;
     std::vector<std::string> ret;
-    while(temp[0] != 0) {
+    while (temp[0] != 0)
+    {
       unsigned char txid[64];
-      memmove((void *)txid, (void *)temp, 64);
-      ret.push_back(std::string((char*)txid));
-      temp+=64;
+      memmove((void *) txid, (void *) temp, 64);
+      ret.push_back(std::string((char *) txid));
+      temp += 64;
     }
 
     return ret;
@@ -72,18 +100,23 @@ namespace Safex
 
   uint64_t WinPendingTransaction::txCount() const
   {
-    return ::win_pt_txCount(m_innerPtr);
+    ENTER_FUNC();
+    auto result = ::win_pt_txCount(m_innerPtr);
+    EXIT_FUNC();
+    return result;
   }
 
   std::vector<uint32_t> WinPendingTransaction::subaddrAccount() const
   {
-    throw std::string("Not implemented yet!!");
+    ENTER_FUNC();
+    EXIT_FUNC();
     return {};
   }
 
   std::vector<std::set<uint32_t>> WinPendingTransaction::subaddrIndices() const
   {
-    throw std::string("Not implemented yet!!");
+    ENTER_FUNC();
+    EXIT_FUNC();
     return {};
   }
 
