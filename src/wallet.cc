@@ -6,6 +6,7 @@
 #include "deferredtask.h"
 #include "walletargs.h"
 #include "wallettasks.h"
+#include "walletlog.h"
 
 
 using namespace v8;
@@ -213,6 +214,7 @@ NAN_METHOD(Wallet::CreateWalletFromKeys) {
 }
 
 NAN_METHOD(Wallet::OpenWallet) {
+    ENTER_FUNC();
     OpenWalletArgs walletArgs;
     std::string error = walletArgs.Init(info);
     if (!error.empty()) {
@@ -223,9 +225,11 @@ NAN_METHOD(Wallet::OpenWallet) {
     OpenWalletTask* task = new OpenWalletTask(walletArgs);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::RecoveryWallet) {
+    ENTER_FUNC();
     RecoveryWalletArgs walletArgs;
     std::string error = walletArgs.Init(info);
     if (!error.empty()) {
@@ -236,6 +240,7 @@ NAN_METHOD(Wallet::RecoveryWallet) {
     RecoveryWalletTask* task = new RecoveryWalletTask(walletArgs);
     auto promise = task->Enqueue();    
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 MaybeLocal<Function> Wallet::FindCallback(const std::string& name) {
@@ -244,9 +249,11 @@ MaybeLocal<Function> Wallet::FindCallback(const std::string& name) {
         return MaybeLocal<Function>();
     }
     return Nan::New(it->second);
+    EXIT_FUNC();
 }
 
 NAN_MODULE_INIT(Wallet::Init) {
+    ENTER_FUNC();
     struct FunctionRegisterInfo {
         const char* name;
         Nan::FunctionCallback func;
@@ -303,6 +310,7 @@ NAN_MODULE_INIT(Wallet::Init) {
 }
 
 v8::Local<v8::Object> Wallet::NewInstance(SafexNativeWallet *wallet) {
+    ENTER_FUNC();
     const unsigned argc = 0;
     Local<Value> argv[1] = { Nan::Null() };
     Local<Function> cons = Nan::New(constructor);
@@ -316,10 +324,12 @@ v8::Local<v8::Object> Wallet::NewInstance(SafexNativeWallet *wallet) {
     wallet->keyReuseMitigation2(false);
 
     w->Wrap(instance);
+    EXIT_FUNC();
     return instance;
 }
 
 NAN_METHOD(Wallet::New) {
+    ENTER_FUNC();
 
   if (info.IsConstructCall()) {
     Wallet* obj = new Wallet(nullptr);
@@ -334,9 +344,11 @@ NAN_METHOD(Wallet::New) {
     Local<Object> instance = cons->NewInstance(context, argc, argv).ToLocalChecked();
     info.GetReturnValue().Set(instance);
   }
+  EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Close)  {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     if (info.Length() > 1 && !info[0]->IsBoolean()) {
@@ -349,27 +361,33 @@ NAN_METHOD(Wallet::Close)  {
     CloseWalletTask* task = new CloseWalletTask(obj->wallet_, store);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Address) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     auto buf = obj->wallet_->address();
     auto addr = Nan::New(buf.c_str()).ToLocalChecked();
 
     info.GetReturnValue().Set(addr);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Seed) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     auto buf = obj->wallet_->seed();
     auto seed = Nan::New(buf.c_str()).ToLocalChecked(); 
 
     info.GetReturnValue().Set(seed);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::On) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     if (info.Length() != 2) {
@@ -385,9 +403,11 @@ NAN_METHOD(Wallet::On) {
 
     obj->callbacks_[toStdString(info[0])] = CopyablePersistentFunction(info.GetIsolate(), Local<Function>::Cast(info[1]));
     info.GetReturnValue().Set(info.Holder());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Off) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     //delete all listeners
@@ -405,23 +425,29 @@ NAN_METHOD(Wallet::Off) {
 
     obj->callbacks_.erase(toStdString(info[0]));
     info.GetReturnValue().Set(info.Holder());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Store) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     StoreWalletTask* task = new StoreWalletTask(obj->wallet_);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Path) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->path().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::NetType) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     std::string nettype;
@@ -430,33 +456,43 @@ NAN_METHOD(Wallet::NetType) {
     }
 
     info.GetReturnValue().Set(Nan::New(nettype.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SecretViewKey) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->secretViewKey().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::PublicViewKey) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->publicViewKey().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SecretSpendKey) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->secretSpendKey().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::PublicSpendKey) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->publicSpendKey().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SetPassword) {
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsString()) {
         Nan::ThrowTypeError("String argument is required");
         return;
@@ -469,9 +505,11 @@ NAN_METHOD(Wallet::SetPassword) {
     }
 
     info.GetReturnValue().Set(info.Holder());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SetRefreshFromBlockHeight) {
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsInt32()) {
         Nan::ThrowTypeError("Integer argument is required");
         return;
@@ -481,15 +519,19 @@ NAN_METHOD(Wallet::SetRefreshFromBlockHeight) {
     obj->wallet_->setRefreshFromBlockHeight(info[0]->Uint32Value(Nan::GetCurrentContext()).ToChecked());
 
     info.GetReturnValue().Set(info.Holder());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::GetRefreshFromBlockHeight) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New((uint32_t)obj->wallet_->getRefreshFromBlockHeight()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Connected) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     std::string status;
@@ -509,9 +551,11 @@ NAN_METHOD(Wallet::Connected) {
     }
 
     info.GetReturnValue().Set(Nan::New(status.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SetTrustedDaemon) {
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsBoolean()) {
         Nan::ThrowTypeError("Integer argument is required");
         return;
@@ -521,71 +565,93 @@ NAN_METHOD(Wallet::SetTrustedDaemon) {
     obj->wallet_->setTrustedDaemon(info[0]->ToBoolean()->Value());
 
     info.GetReturnValue().Set(info.Holder());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::TrustedDaemon) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->trustedDaemon()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Balance) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     // it seems v8 doesn't have uint64
     info.GetReturnValue().Set(Nan::New(std::to_string(obj->wallet_->balanceAll()).c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::UnlockedBalance) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(std::to_string(obj->wallet_->unlockedBalanceAll()).c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
   NAN_METHOD(Wallet::TokenBalance) {
+    ENTER_FUNC();
           Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
           // it seems v8 doesn't have uint64
           info.GetReturnValue().Set(Nan::New(std::to_string(obj->wallet_->tokenBalanceAll()).c_str()).ToLocalChecked());
+          EXIT_FUNC();
   }
 
   NAN_METHOD(Wallet::UnlockedTokenBalance) {
+    ENTER_FUNC();
           Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
           info.GetReturnValue().Set(Nan::New(std::to_string(obj->wallet_->unlockedTokenBalanceAll()).c_str()).ToLocalChecked());
+          EXIT_FUNC();
   }
 
 NAN_METHOD(Wallet::BlockChainHeight) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
     info.GetReturnValue().Set(Nan::New((uint32_t)obj->wallet_->blockChainHeight()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::DaemonBlockChainHeight) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New((uint32_t)obj->wallet_->daemonBlockChainHeight()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::Synchronized) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->synchronized()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::GenPaymentId) {
+    ENTER_FUNC();
     info.GetReturnValue().Set(Nan::New(SafexNativeWallet::genPaymentId().c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::PaymentIdValid) {
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsString()) {
         Nan::ThrowTypeError("String argument is required");
         return;
     }
 
     info.GetReturnValue().Set(Nan::New(SafexNativeWallet::paymentIdValid(toStdString(info[0]))));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::AddressValid) {
+    ENTER_FUNC();
     if (info.Length() != 2 || !info[0]->IsString() || !info[1]->IsString()) {
         Nan::ThrowTypeError("2 string arguments are required");
         return;
@@ -593,33 +659,42 @@ NAN_METHOD(Wallet::AddressValid) {
 
     Safex::NetworkType nettype;
     if (!getNettype(toStdString(info[1]), nettype)) {
+        ENTER_FUNC();
         Nan::ThrowError("wrong network type argument");
         return;
     }
     bool valid = SafexNativeWallet::addressValid(toStdString(info[0]), nettype);
     info.GetReturnValue().Set(Nan::New(valid));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::RescanBlockchain) {
+    ENTER_FUNC();
         Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
         obj->wallet_->setRefreshFromBlockHeight(0);
         obj->wallet_->rescanBlockchain();
+        EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::RescanBlockchainAsync) {
+    ENTER_FUNC();
         Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
         obj->wallet_->setRefreshFromBlockHeight(0);
         obj->wallet_->rescanBlockchainAsync();
+        EXIT_FUNC();
 }
 
 
 NAN_METHOD(Wallet::DefaultMixin) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
 
     info.GetReturnValue().Set(Nan::New(obj->wallet_->defaultMixin()));
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::SetDefaultMixin) {
+    ENTER_FUNC();
     if (info.Length() != 1 || !info[0]->IsInt32()) {
         Nan::ThrowTypeError("Integer argument is required");
         return;
@@ -627,19 +702,25 @@ NAN_METHOD(Wallet::SetDefaultMixin) {
 
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
     obj->wallet_->setDefaultMixin(Nan::To<v8::Int32>(info[0]).ToLocalChecked()->Value());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::StartRefresh) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
     obj->wallet_->startRefresh();
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::PauseRefresh) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
     obj->wallet_->pauseRefresh();
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::TransactionHistory) {
+    ENTER_FUNC();
     Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
     auto history = obj->wallet_->history();
     history->refresh();
@@ -657,9 +738,11 @@ NAN_METHOD(Wallet::TransactionHistory) {
     }
 
     info.GetReturnValue().Set(result);
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::CreateTransaction) {
+    ENTER_FUNC();
     CreateTransactionArgs txArgs;
     std::string error = txArgs.Init(info);
     if (!error.empty()) {
@@ -670,10 +753,12 @@ NAN_METHOD(Wallet::CreateTransaction) {
     CreateTransactionTask* task = new CreateTransactionTask(txArgs, obj->wallet_);
     auto promise = task->Enqueue();
     info.GetReturnValue().Set(promise);
+    EXIT_FUNC();
 }
 
 
 NAN_METHOD(Wallet::SignMessage) {
+    ENTER_FUNC();
 
     if (info.Length() != 1 || !info[0]->IsString()) {
         Nan::ThrowTypeError("Function accepts string argument");
@@ -688,9 +773,11 @@ NAN_METHOD(Wallet::SignMessage) {
     }
 
     info.GetReturnValue().Set(Nan::New(signature.c_str()).ToLocalChecked());
+    EXIT_FUNC();
 }
 
 NAN_METHOD(Wallet::VerifySignedMessage) {
+    ENTER_FUNC();
 
     if (info.Length() != 3 || !info[0]->IsString() || !info[1]->IsString() || !info[2]->IsString()) {
         Nan::ThrowTypeError("Function accepts message, monero address and signature as string arguments");
@@ -710,6 +797,7 @@ NAN_METHOD(Wallet::VerifySignedMessage) {
     }
 
     info.GetReturnValue().Set(valid);
+    EXIT_FUNC();
 }
 
 } //namespace exawallet
