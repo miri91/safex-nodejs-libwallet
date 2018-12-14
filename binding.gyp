@@ -38,7 +38,8 @@
             "src/win/winwalletlistener.cpp",
             "src/win/winwalletmanager.cpp",
             "src/win/winpendingtransaction.cpp",
-            "src/win/misc.cpp"
+            "src/win/misc.cpp",
+            "src/walletlog.cpp"
           ],
           "libraries": [
             '-l../deps/libwin_wallet_wrapper.lib' 
@@ -126,7 +127,8 @@
             "src/walletargs.cc",
             "src/deferredtask.cc",
             "src/wallettasks.cc",
-            "src/pendingtransaction.cc"
+            "src/pendingtransaction.cc",
+            "src/walletlog.cpp"
           ],
           "libraries": [
             "../deps/libwallet_merged.a",
