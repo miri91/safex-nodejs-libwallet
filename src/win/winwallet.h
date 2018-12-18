@@ -94,6 +94,8 @@ namespace Safex
 
     virtual std::string paymentId() const;
 
+    void loadTransfers();
+
     //! only applicable for output transactions
     virtual const std::vector<WinTransactionInfo::Transfer> &transfers() const;
 
@@ -101,6 +103,7 @@ namespace Safex
 
   private:
     void *m_innerPtr;
+    std::vector<Safex::WinTransactionInfo::Transfer> m_transfers;
   };
 
 
@@ -122,7 +125,7 @@ namespace Safex
   struct WinWallet
   {
 
-    WinWallet(void *self_):m_innerPtr{self_} {}
+    WinWallet(void *self_):m_innerPtr{self_}, m_history(nullptr) {}
 
     virtual ~WinWallet();
     virtual std::string seed() const;
@@ -183,6 +186,7 @@ namespace Safex
   private:
     void *m_innerPtr;
     void *m_nativeListenerPtr;
+    WinTransactionHistory* m_history;
   };
 
 }

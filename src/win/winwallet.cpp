@@ -91,30 +91,33 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
     return std::string(win_txinfo_paymentId(m_innerPtr));
   }
 
+  void WinTransactionInfo::loadTransfers() {
+
+    if(m_transfers.size() == 0) {
+      char* buffer = ::win_txinfo_transfers(m_innerPtr);
+      uint32_t offset = 0;
+      uint32_t transfer_len;
+      memcpy(&transfer_len, buffer, sizeof(uint32_t));
+      offset = sizeof(uint32_t);
+      for(uint32_t i = 0; i < transfer_len; ++i) {
+        uint32_t addr_len = 0;
+        uint64_t amount;
+        uint64_t token_amount;
+        std::string addr;
+        memcpy(&(amount), buffer+offset, sizeof(uint64_t));
+        offset += sizeof(uint64_t);
+        memcpy(&(token_amount), buffer+offset, sizeof(uint64_t));
+        offset += sizeof(uint64_t);
+        addr = std::string(buffer+offset);
+        offset += addr.size()+1;
+        m_transfers.emplace_back(amount, token_amount, addr);
+      }
+    }
+  }
+
   const std::vector<WinTransactionInfo::Transfer> &WinTransactionInfo::transfers() const
   {
-    std::vector<WinTransactionInfo::Transfer> ret;
-    char* buffer = ::win_txinfo_transfers(m_innerPtr);
-    uint32_t offset = 0;
-
-    uint32_t transfer_len;
-    memcpy(&transfer_len, buffer, sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    for(uint32_t i = 0; i < transfer_len; ++i) {
-      uint32_t addr_len = 0;
-      uint64_t amount;
-      uint64_t token_amount;
-      std::string addr;
-      memcpy(&(amount), buffer+offset, sizeof(uint64_t));
-      offset += sizeof(uint64_t);
-      memcpy(&(token_amount), buffer+offset, sizeof(uint64_t));
-      offset += sizeof(uint64_t);
-      addr = std::string(buffer+offset);
-      offset += addr.size() + 1;
-
-      ret.emplace_back(amount, token_amount, addr);
-    }
-    return ret;
+    return m_transfers;
   }
 
   TransactionType WinTransactionInfo::transactionType() const
@@ -125,7 +128,6 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
 
   WinTransactionHistory::~WinTransactionHistory()
   {
-    win_txhist_Delete(m_innerPtr);
   }
 
   int WinTransactionHistory::count() const
@@ -155,7 +157,6 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
     for(uint32_t i = 0; i < size; ++i) {
       ret.push_back(new WinTransactionInfo(results[i]));
     }
-
     return ret;
   }
 
@@ -262,7 +263,7 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
 
   std::string WinWallet::genPaymentId()
   {
-    return std::string(win_GenPaymentId(m_innerPtr));
+    return std::string(win_GenPaymentId());
   }
 
   uint64_t WinWallet::daemonBlockChainHeight() const
@@ -277,12 +278,12 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
 
   bool WinWallet::paymentIdValid(const std::string &paiment_id)
   {
-    return static_cast<bool>(win_PaymentIdValid(m_innerPtr, paiment_id.c_str()));
+    return static_cast<bool>(win_PaymentIdValid(paiment_id.c_str()));
   }
 
   bool WinWallet::addressValid(const std::string &str, NetworkType nettype)
   {
-    return static_cast<bool>(win_static_addressValid(m_innerPtr, str.c_str(), static_cast<uint32_t>(nettype)));
+    return static_cast<bool>(win_static_addressValid(str.c_str(), static_cast<uint32_t>(nettype)));
   }
 
   uint32_t WinWallet::defaultMixin() const
@@ -292,7 +293,13 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
 
   WinTransactionHistory *WinWallet::history()
   {
-    return nullptr;
+    if(m_history != nullptr) {
+      delete m_history;
+      m_history = nullptr;
+    }
+
+    m_history = new WinTransactionHistory(win_history(m_innerPtr));
+    return m_history;
   }
 
 

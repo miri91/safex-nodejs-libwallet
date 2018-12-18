@@ -14,8 +14,6 @@ namespace exawallet {
 
 namespace {
 
-
-
 std::string toStdString(const Local<Value>& val) {
     Nan::Utf8String nanStr(val);
     return std::string (*nanStr);
@@ -67,9 +65,12 @@ Local<String> convertAmount(uint64_t amount) {
 }
 
 Local<Object> makeTransactionInfoObject(const SafexNativeTransactionInfo* transaction) {
+    #if _MSC_VER
+        static_cast<Safex::WinTransactionInfo*>(const_cast<::SafexNativeTransactionInfo*>(transaction))->loadTransfers();
+    #endif
+
     auto transfersNative = transaction->transfers();
     auto transfers = Nan::New<Array>(transfersNative.size());
-
     for (size_t i = 0; i < transfersNative.size(); ++i) {
         const auto& transfer = transfersNative[i];
 
@@ -78,10 +79,14 @@ Local<Object> makeTransactionInfoObject(const SafexNativeTransactionInfo* transa
                    Nan::New("amount").ToLocalChecked(),
                    convertAmount(transfer.amount));
 
+         trObj->Set(Nan::GetCurrentContext(),
+                   Nan::New("token_amount").ToLocalChecked(),
+                   convertAmount(transfer.token_amount));
+
         trObj->Set(Nan::GetCurrentContext(),
                    Nan::New("address").ToLocalChecked(),
                    Nan::New(transfer.address.c_str()).ToLocalChecked());
-
+        
         transfers->Set(Nan::GetCurrentContext(), i, trObj);
     }
 
