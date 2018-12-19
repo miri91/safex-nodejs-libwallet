@@ -15,6 +15,7 @@ struct CreateWalletArgs {
     std::string language;
     std::string daemonAddress;
     Safex::NetworkType nettype;
+    bool useSSL;
 };
 
 struct CreateWalletFromKeysArgs {
@@ -30,6 +31,7 @@ struct CreateWalletFromKeysArgs {
   std::string addressString;
   std::string viewKeyString;
   std::string spendKeyString;
+  bool useSSL;
 };
 
 struct OpenWalletArgs {
@@ -40,6 +42,7 @@ struct OpenWalletArgs {
     std::string password;
     std::string daemonAddress;
     Safex::NetworkType nettype;
+    bool useSSL;
 };
 
 
@@ -53,6 +56,7 @@ struct RecoveryWalletArgs {
     Safex::NetworkType nettype;
     std::string mnemonic;
     uint64_t restoreHeight;
+    bool useSSL;
 };
 
 

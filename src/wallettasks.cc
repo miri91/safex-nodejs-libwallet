@@ -27,7 +27,7 @@ std::string CreateWalletTask::doWork() {
         return wallet_->errorString();
     }
 
-    if (!wallet_->init(args_.daemonAddress)) {
+    if (!wallet_->init(args_.daemonAddress, 0 /*upper_transaction_size_limit*/, "" /*daemon_username*/, "" /*daemon_password*/, args_.useSSL, false)) {
         return "Couldn't init wallet";
     }
 
@@ -57,7 +57,7 @@ std::string CreateWalletFromKeysTask::doWork() {
     return wallet_->errorString();
   }
 
-  if (!wallet_->init(args_.daemonAddress)) {
+  if (!wallet_->init(args_.daemonAddress, 0 /*upper_transaction_size_limit*/, "" /*daemon_username*/, "" /*daemon_password*/, args_.useSSL, false)) {
     return "Couldn't init wallet";
   }
 
@@ -86,7 +86,7 @@ std::string OpenWalletTask::doWork() {
         return wallet_->errorString();
     }
 
-    if (!wallet_->init(args_.daemonAddress)) {
+    if (!wallet_->init(args_.daemonAddress, 0 /*upper_transaction_size_limit*/, "" /*daemon_username*/, "" /*daemon_password*/, args_.useSSL, false)) {
         return "Couldn't init wallet";
     }
 
@@ -125,8 +125,8 @@ std::string RecoveryWalletTask::doWork() {
     if (!wallet_->errorString().empty()) {
         return wallet_->errorString();
     }
-    
-    if (!wallet_->init(args_.daemonAddress)) {
+
+    if (!wallet_->init(args_.daemonAddress, 0 /*upper_transaction_size_limit*/, "" /*daemon_username*/, "" /*daemon_password*/, args_.useSSL, false)) {
         return "Couldn't init wallet";
     }
 

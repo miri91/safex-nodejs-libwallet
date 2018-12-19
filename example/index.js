@@ -24,10 +24,11 @@ const wallet_path = path.join(__dirname, 'test-wallet');
 
 
 var args = {
-     'path': wallet_path,
+    'path': wallet_path,
  	'password': '123',
- 	'network': 'testnet',
- 	'daemonAddress': '192.168.1.194:29393',
+	'network': "testnet",
+ 	'daemonAddress': 'https://safex.mayan.icu:443',
+	'ssl': true,
  	'restoreHeight': 0,
     'addressString':  'SFXtzU6Azx3N61CBXBK2KZBGUw2U3XQXKEZkSvBrfeczNvn6yXeWk4wXkNajNNe7xv1eeuH4rrrFiJMC5Ed1uN3GXt5vuDJkV3B',
     'viewKeyString':  'c135405a2f0e0b6302e0c2d0a5f056fbf7f37eaad7bf67769d6fa35d2a55e200',
@@ -52,13 +53,14 @@ const nextTick = () => {
 		console.log("address: " + wallet.address());
 		console.log("balance: " + wallet.balance());
 		console.log("unlocked balance: " + wallet.unlockedBalance());
-        console.log("token balance: " + wallet.tokenBalance());
-        console.log("unlocked token balance: " + wallet.unlockedTokenBalance());
+                console.log("token balance: " + wallet.tokenBalance());
+                console.log("unlocked token balance: " + wallet.unlockedTokenBalance());
 		console.log("seed: " + wallet.seed());
 		console.log("secret view key: " + wallet.secretViewKey());
 		console.log("secret spend key: " + wallet.secretSpendKey());
 		console.log("public view key: " + wallet.publicViewKey());
 		console.log("public spend key: " + wallet.publicSpendKey());
+                console.log("connected: " + wallet.connected());
     }
 
     setTimeout(nextTick, 10000);
@@ -71,7 +73,7 @@ promise
 
 		wallet = w;
 		wallet.on('newBlock', function (height) {
-			if(height-lastHeight>1000) {
+			if(height-lastHeight>100) {
 				console.log("blockchain updated, height: " + height);
 				lastHeight = height;
 			}
