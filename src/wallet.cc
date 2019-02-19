@@ -272,6 +272,7 @@ NAN_MODULE_INIT(Wallet::Init) {
         {"close", Close},
         {"address", Address},
         {"seed", Seed},
+        {"setSeedLanguage", SetSeedLanguage},
         {"on", On},
         {"off", Off},
         {"store", Store},
@@ -393,6 +394,18 @@ NAN_METHOD(Wallet::Seed) {
 
     info.GetReturnValue().Set(seed);
     EXIT_FUNC();
+}
+
+NAN_METHOD(Wallet::SetSeedLanguage) {
+    Wallet* obj = ObjectWrap::Unwrap<Wallet>(info.Holder());
+    if (info.Length() != 1 || !info[0]->IsString()) {
+            Nan::ThrowTypeError("String argument is required");
+            return;
+        }
+
+    obj->wallet_->setSeedLanguage(toStdString(info[0]->ToString()));
+
+    info.GetReturnValue().Set(info.Holder());
 }
 
 NAN_METHOD(Wallet::On) {

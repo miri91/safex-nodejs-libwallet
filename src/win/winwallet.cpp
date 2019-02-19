@@ -593,5 +593,10 @@ WinTransactionInfo::Transfer::Transfer(uint64_t _amount, uint64_t _token_amount,
     EXIT_FUNC();
   }
 
+  void WinWallet::setSeedLanguage(const std::string &seedLanguage)
+  {
+    win_setSeedLanguage(m_innerPtr, seedLanguage.c_str());
+  }
+
 
 }
